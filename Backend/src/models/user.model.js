@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import jwt from "jsonwebtoken"; // You need to import jwt if you're using it
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
     required: [true, "Name Required!"],
@@ -23,63 +24,56 @@ const userSchema = mongoose.Schema({
     type: String,
     required: [true, "Password Required!"],
     minLength: [8, "Passsword Must Contain At Least 8 Characters!"],
-    select: false,
+    select: false, // By default, password won't be returned in queries
   },
   avatar: {
-    public_id: {
-      type: String,
-      required: true,
+    type: {
+      public_id: String,
+      url: String
     },
-    url: {
-      type: String,
-      required: true,
-    },
+    required: true
   },
   resume: {
-    public_id: {
-      type: String,
-      required: true,
+    type: {
+      public_id: String,
+      url: String
     },
-    url: {
-      type: String,
-      required: true,
-    },
+    required: true
   },
   portfolioURL: {
     type: String,
     required: [true, "Portfolio URL Required"],
   },
-  githubURL: {
+  githubURL: String,
+  instagramURL: String,
+  twitterURL: String,
+  linkedInURL: String,
+  facebookURL: String,
+  resetPasswordToken: {
     type: String,
+    select: false,
   },
-  instagramURL: {
-    type: String,
-  },
-  twitterURL: {
-    type: String,
-  },
-  linkedInURL: {
-    type: String,
-  },
-  facebookURL: {
-    type: String,
-  },
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
-});
-
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    next();
+  resetPasswordExpire: {
+    type: Date, // Use Date for expiration times
+    select: false,
   }
-  this.password = await bcrypt.hash(this.password, 10);
 });
 
+// Hashing password before saving the user
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+// Method to compare passwords
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userSchema.methods.generateJwtTokend = function () {
+// Method to generate JWT token
+userSchema.methods.generateJwtToken = function () {
   return jwt.sign(
     {
       _id: this._id,
@@ -93,22 +87,19 @@ userSchema.methods.generateJwtTokend = function () {
   );
 };
 
-//generating Reset Password Token
-
+// Method to generate reset password token
 userSchema.methods.getResetPasswordToken = function () {
-  // generating token
+  // Generate token
   const resetToken = crypto.randomBytes(20).toString("hex");
 
-  // Hashing and Adding Reset Password Token to UserSchema
-
+  // Hashing the token and setting it to the schema
   this.resetPasswordToken = crypto
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
 
-  // Setting Reset Password Token Expiry Time
-
-  this.resetPasswordExpiry = Data.now() + 15 * 60 * 1000;
+  // Setting token expiration time (15 minutes)
+  this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
 
   return resetToken;
 };
