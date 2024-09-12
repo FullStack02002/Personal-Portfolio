@@ -153,4 +153,83 @@ const logoutUser=asyncHandler(async(req,res)=>{
 
 })
 
-export { registerUser, loginUser ,logoutUser};
+const getCurrentUser=asyncHandler(async(req,res)=>{
+  return res.status(200).json(new ApiResponse(200,req?.user,"User fetched Succesfully"));
+})
+
+const updateProfile=asyncHandler(async(req,res)=>{
+
+  const newUserData={
+    fullName:req.body.fullName,
+    email:req.body.email,
+    phone:req.body.phone,
+    aboutMe:req.body.aboutMe,
+    githubURL:req.body.githubURL,
+    instagramURL:req.body.instagramURL,
+    portfolioURL:req.body.portfolioURL,
+    facebookURL:req.body.facebookURL,
+    twitterURL:req.body.twitterURL,
+    linkedInURL:req.body.linkedInURL
+  }
+
+  if(req.files && req.files.avatar){
+    const avatarLocalPath= req.files?.avatar[0]?.path;
+    const user=await User.findById(req.user?._id);
+    const oldAvatarPublicId=user.avatar?.public_id;
+    await deleteFromCloudinary(oldAvatarPublicId);
+    const avatar=await uploadOnCloudinary(avatarLocalPath);
+
+    newUserData.avatar={
+      public_id:avatar.public_id,
+      url:avatar?.secure_url
+    }
+  }
+
+  if(req.files && req.files.resume){
+    const resumeLocalPath= req.files?.resume[0]?.path;
+    const user=await User.findById(req.user?._id);
+    const oldResumePublicId=user.resume?.public_id;
+    await deleteFromCloudinary(oldResumePublicId);
+    const resume=await uploadOnCloudinary(resumeLocalPath);
+
+    newUserData.resume={
+      public_id:resume.public_id,
+      url:resume?.secure_url
+    }
+  }
+
+
+  const modifiedUser=await User.findByIdAndUpdate(req.user?._id,newUserData,{
+    new:true,
+    runValidators: true,
+    useFindAndModify: false,
+  
+  })
+
+
+  return res.status(200).json(new ApiResponse(200,modifiedUser,"Profile Updated Succesfully"))
+
+})
+
+const changePassword=asyncHandler(async(req,res)=>{
+  const {oldPassword,newPassword}=req.body;
+
+  if(!oldPassword || !newPassword){
+    throw new ApiError(400,"Please provide both old and new Passwords");
+  }
+
+  const user=await User.findById(req.user?._id).select("+password");
+  const isPasswordCorrect=await user.comparePassword(oldPassword);
+
+  if(!isPasswordCorrect){
+    throw new ApiError(400,"Old Password is Incorrect");
+  }
+  user.password=newPassword;
+  await user.save();
+
+  return res.status(200).json(new ApiResponse(200,{},"Password Changed Succesfully"))
+
+
+})
+
+export { registerUser, loginUser ,logoutUser,getCurrentUser,updateProfile,changePassword};
