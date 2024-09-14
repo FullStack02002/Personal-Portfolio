@@ -21,12 +21,14 @@ app.get('/',(req,res)=>{
 
 //route import 
 import userRouter from "./routes/user.routes.js"
+import timelineRouter from "./routes/timeline.routes.js"
 
 
 
 // routes declaration
 
 app.use("/api/v1/users",userRouter);
+app.use("/api/v1/timeline",timelineRouter)
 
 
 
