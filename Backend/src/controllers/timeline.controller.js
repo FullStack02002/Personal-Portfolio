@@ -36,9 +36,15 @@ const deleteTimeline=asyncHandler(async(req,res)=>{
         throw new ApiError(400,"Invalid Timeline Id")
     }
 
+    const timeline=await Timeline.findById(timelineId);
+
+    if(!timeline){
+        throw new ApiError(404,"Timeline Not Found")
+    }
+
     await Timeline.findByIdAndDelete(timelineId);
 
-    return res.status(200).json(new ApiResponse(200,timelineId,"Timeline Deleted Succesfully"));
+    return res.status(200).json(new ApiResponse(200,timeline,"Timeline Deleted Succesfully"));
 
 
 })

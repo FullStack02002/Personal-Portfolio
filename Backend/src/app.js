@@ -22,6 +22,7 @@ app.get('/',(req,res)=>{
 //route import 
 import userRouter from "./routes/user.routes.js"
 import timelineRouter from "./routes/timeline.routes.js"
+import messageRouter from "./routes/message.routes.js"
 
 
 
@@ -29,6 +30,7 @@ import timelineRouter from "./routes/timeline.routes.js"
 
 app.use("/api/v1/users",userRouter);
 app.use("/api/v1/timeline",timelineRouter)
+app.use("/api/v1/message",messageRouter)
 
 
 
