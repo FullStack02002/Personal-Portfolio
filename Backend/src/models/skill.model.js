@@ -7,6 +7,7 @@ const skillSchema=new mongoose.Schema({
     },
     proficiency:{
         type:Number,
+        required:true,
     },
     svg:{
         type:{
