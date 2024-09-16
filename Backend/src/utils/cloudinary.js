@@ -1,3 +1,4 @@
+import { compareSync } from "bcrypt";
 import { v2 as cloudinary } from "cloudinary";
 
 import fs from "fs";
@@ -35,6 +36,9 @@ const deleteFromCloudinary = async (public_id, resource_type = "image") => {
       resource_type: `${resource_type}`,
       secure: true,
     });
+
+    
+
   } catch (error) {
     return error;
     console.log("delete on cloudinary failed", error);
