@@ -2,10 +2,12 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
+import crypto from "crypto";
 import {
   uploadOnCloudinary,
   deleteFromCloudinary,
 } from "../utils/cloudinary.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   const {
@@ -232,4 +234,98 @@ const changePassword=asyncHandler(async(req,res)=>{
 
 })
 
-export { registerUser, loginUser ,logoutUser,getCurrentUser,updateProfile,changePassword};
+const forgotPassword=asyncHandler(async(req,res)=>{
+  const {email}=req.body;
+  if(!email){
+    throw new ApiError(400,"Please provide your email");
+  }
+  const user=await User.findOne({email});
+
+  if(!user){
+    throw new ApiError(400,"User with this email does not exist");
+  }
+  const resetToken=user.generateResetPasswordToken();
+  await user.save({validateBeforeSave:false});
+
+  const resetPasswordUrl=`${process.env.DASHBOARD_URL}/password/reset/${resetToken}`;
+
+  const message = `Your Reset Password Token is:- \n\n ${resetPasswordUrl}  \n\n If 
+  You've not requested this email then, please ignore it.`;
+
+  try {
+
+    await sendEmail({
+      email: user.email,
+      subject: `Personal Portfolio Dashboard Password Recovery`,
+      message,
+    })
+    return res.status(200).json(new ApiResponse(200,{},"Reset Password Email Sent Successfully"))
+    
+  } catch (error) {
+    console.log(error)
+    user.resetPasswordToken=undefined;
+    user.resetPasswordExpire=undefined;
+    await user.save({validateBeforeSave:false});
+    throw new ApiError(500,"Error in sending the email");
+  }
+
+
+})
+
+const resetPassword=asyncHandler(async(req,res)=>{
+  const {token}=req.params;
+  const {newPassword,confirmPassword}=req.body;
+
+  if(!newPassword || !confirmPassword){
+    throw new ApiError(400,"Please provide your new password and confirm password");
+  }
+  if(newPassword!==confirmPassword){
+    throw new ApiError(400,"Passwords do not match");
+  }
+
+  const resetPasswordToken=crypto.createHash("sha256").update(token).digest("hex");
+  const user=await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire:{$gt:Date.now()}
+  }).select("+resetPasswordToken +resetPasswordExptire");
+
+  if(!user){
+    throw new ApiError(400,"Invalid token or expired");
+  }
+
+  user.password=await newPassword;
+  user.resetPasswordToken=undefined;
+  user.resetPasswordExpire=undefined;
+
+  await user.save();
+
+  const jwtToken=await user.generateJwtToken();
+
+  const loggedInUser=await User.findById(user?._id);
+
+  if(!loggedInUser){
+    throw new ApiError(400,"Error in logging in");
+  }
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+    path: "/",
+  };
+  return res
+  .status(200)
+  .cookie("jwtToken", jwtToken, options)
+  .json(
+    new ApiResponse(
+      200,
+      {
+        user: loggedInUser,
+      },
+      "Reset Password Successfully!"
+    )
+  );
+
+})
+
+
+export { registerUser, loginUser ,logoutUser,getCurrentUser,updateProfile,changePassword,forgotPassword,resetPassword};
