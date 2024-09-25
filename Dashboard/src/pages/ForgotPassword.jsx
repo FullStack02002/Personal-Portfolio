@@ -1,41 +1,43 @@
 import React from "react";
-import { Await, Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import SpecialLoadingButton from "./sub-components/SpecialLoadingButton";
-import { adminLogin, getCurrentUser } from "@/store/Slices/authSlice";
-const LoginPage = () => {
+import { forgotPassword } from "@/store/Slices/authSlice";
+import { useForm } from "react-hook-form";
+
+const ForgotPassword = () => {
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.auth?.loading);
+  const isAuthenticated = useSelector((state) => state.auth?.status);
+  const navigate=useNavigate();
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const loading = useSelector((state) => state.auth?.loading);
 
-  const submit=async(data)=>{
-    const response=await dispatch(adminLogin(data));
-    const user=await dispatch(getCurrentUser());
 
-    if(response?.payload && user){
-      navigate("/")
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
     }
-  }
+  }, [isAuthenticated]);
 
+  const submit = async (data) => {
+    await dispatch(forgotPassword(data));
+  };
   return (
     <div className="w-full lg:grid lg:min-h-[100vh] lg:grid-cols-2 xl:min-h-[100vh]">
       <div className=" min-h-[100vh] flex items-center justify-center py-12">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Login</h1>
+            <h1 className="text-3xl font-bold">Forgot Password</h1>
             <p className="text-balance text-muted-foreground">
-              Enter your email below to login to your account
+              Enter your email to request for reset password
             </p>
           </div>
           <form onSubmit={handleSubmit(submit)}>
@@ -46,9 +48,8 @@ const LoginPage = () => {
                   id="email"
                   type="email"
                   placeholder="m@example.com"
-                  required
                   {...register("email", {
-                    required: "Email is required",
+                    required: "Email is Required",
                   })}
                 />
                 {errors.email && (
@@ -57,43 +58,28 @@ const LoginPage = () => {
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label>Password</Label>
                   <Link
-                    to="/password/forgot"
+                    to="/login"
                     className="ml-auto inline-block text-sm underline"
                   >
-                    Forgot your password?
+                    Remember your password?
                   </Link>
                 </div>
-                <Input
-                  type="password"
-                  {...register("password", {
-                    required: "Password is required",
-                  })}
-                />
-                {errors.password && (
-                  <div className="text-red-700">{errors.password.message}</div>
-                )}
               </div>
-              {loading ? (
-                <SpecialLoadingButton content={"Loggin In"} />
+              {!loading ? (
+                <Button className="w-full">Forgot Password</Button>
               ) : (
-                <Button
-                  //   onClick={() => handleLogin(email, password)}
-                  className="w-full"
-                >
-                  Login
-                </Button>
+                <SpecialLoadingButton content={"Requesting"} />
               )}
             </div>
           </form>
         </div>
       </div>
       <div className="flex justify-center items-center bg-muted">
-        <img src="/login.png" alt="login" />
+        <img src="/forgot.png" alt="login" />
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default ForgotPassword;
