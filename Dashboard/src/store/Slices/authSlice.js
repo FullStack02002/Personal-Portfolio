@@ -56,6 +56,17 @@ export const resetPassword = createAsyncThunk("resetPassword", async (data) => {
   }
 });
 
+export const logOut = createAsyncThunk("logOut", async () => {
+  try {
+    const response=await axiosInstance.post("/users/logout");
+    toast.success("Admin Logged Out Succesfully")
+    return response.data;
+  } catch (error) {
+    toast.error(error?.response?.data?.error);
+    throw error;
+  }
+});
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -69,7 +80,7 @@ const authSlice = createSlice({
       state.status = true;
       state.userData = action.payload;
     });
-    builder.addCase(adminLogin.rejected, (state, action) => {
+    builder.addCase(adminLogin.rejected, (state) => {
       state.loading = false;
       state.status = false;
       state.userData = null;
@@ -96,14 +107,25 @@ const authSlice = createSlice({
     builder.addCase(forgotPassword.rejected, (state) => {
       state.loading = false;
     });
-    builder.addCase(resetPassword.pending,(state)=>{
-        state.loading=true;
+    builder.addCase(resetPassword.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(resetPassword.fulfilled, (state) => {
+      state.loading = false;
+    });
+    builder.addCase(resetPassword.rejected, (state) => {
+      state.loading = false;
+    });
+    builder.addCase(logOut.pending,(state)=>{
+      state.loading=true;
     })
-    builder.addCase(resetPassword.fulfilled,(state)=>{
-        state.loading=false;
+    builder.addCase(logOut.fulfilled,(state)=>{
+      state.loading=false;
+      state.status=false;
+      state.userData=null;
     })
-    builder.addCase(resetPassword.rejected,(state)=>{
-        state.loading=false;
+    builder.addCase(logOut.rejected,(state)=>{
+      state.loading=false;
     })
   },
 });
