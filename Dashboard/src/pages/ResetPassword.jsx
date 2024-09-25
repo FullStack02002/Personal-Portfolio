@@ -20,6 +20,7 @@ const ResetPassword = () => {
   } = useForm();
   const { token } = useParams();
 
+//   for checking newPassword and Confirm Password should Match
   const newPassword = watch("newPassword");
 
   const submit = async (data) => {
