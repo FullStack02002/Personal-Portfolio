@@ -28,6 +28,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import SpecialLoadingButton from "./SpecialLoadingButton";
+import { getAllTimeline,makeTimelineEmpty } from "@/store/Slices/timelineSlice";
 const Dashboard = () => {
   const navigateTo = useNavigate();
   const gotoMangeSkills = () => {
@@ -41,6 +42,24 @@ const Dashboard = () => {
   };
 
   const { userData } = useSelector((state) => state.auth);
+  const timelines=useSelector((state)=>state.timeline.timeline)
+  
+
+  useEffect(()=>{
+    dispatch(getAllTimeline());
+
+    return ()=>{
+        dispatch(makeTimelineEmpty());
+    }
+
+  },[])
+
+
+
+
+
+
+
 //   const {
 //     skills,
 //     loading: skillLoading,
@@ -53,17 +72,12 @@ const Dashboard = () => {
 //     error: appError,
 //     message: appMessage,
 //   } = useSelector((state) => state.softwareApplications);
-//   const {
-//     timeline,
-//     loading: timelineLoading,
-//     error: timelineError,
-//     message: timelineMessage,
-//   } = useSelector((state) => state.timeline);
+
 //   const { projects, error: projectError } = useSelector(
 //     (state) => state.project
 //   );
 
-  const [appId, setAppId] = useState(null);
+//   const [appId, setAppId] = useState(null);
 //   const handleDeleteSoftwareApp = (id) => {
 //     setAppId(id);
 //     dispatch(deleteSoftwareApplication(id));
@@ -290,9 +304,9 @@ const Dashboard = () => {
                           </TableHead>
                         </TableRow>
                       </TableHeader>
-                      {/* <TableBody>
-                        {timeline && timeline.length > 0 ? (
-                          timeline.map((element) => {
+                      <TableBody>
+                        {timelines && timelines.length > 0 ? (
+                          timelines.map((element) => {
                             return (
                               <TableRow className="bg-accent" key={element._id}>
                                 <TableCell className="font-medium">
@@ -314,7 +328,7 @@ const Dashboard = () => {
                             </TableCell>
                           </TableRow>
                         )}
-                      </TableBody> */}
+                      </TableBody>
                     </Table>
                   </CardContent>
                 </Card>
