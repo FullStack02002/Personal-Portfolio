@@ -28,7 +28,15 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import SpecialLoadingButton from "./SpecialLoadingButton";
-import { getAllTimeline,makeTimelineEmpty } from "@/store/Slices/timelineSlice";
+import {
+  getAllTimeline,
+  makeTimelineEmpty,
+} from "@/store/Slices/timelineSlice";
+import {
+  getAllApplication,
+  makeapplicationsEmpty,
+  deleteApplication,
+} from "@/store/Slices/softwareApplicationSlice";
 const Dashboard = () => {
   const navigateTo = useNavigate();
   const gotoMangeSkills = () => {
@@ -42,49 +50,27 @@ const Dashboard = () => {
   };
 
   const { userData } = useSelector((state) => state.auth);
-  const timelines=useSelector((state)=>state.timeline.timeline)
-  
+  const timelines = useSelector((state) => state.timeline.timeline);
+  const applications = useSelector(
+    (state) => state.softwareApplication?.applications
+  );
+  const deleting = useSelector((state) => state.softwareApplication?.deleting);
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(getAllTimeline());
+    dispatch(getAllApplication());
 
-    return ()=>{
-        dispatch(makeTimelineEmpty());
-    }
-
-  },[])
-
-
-
-
-
-
-
-//   const {
-//     skills,
-//     loading: skillLoading,
-//     error: skillError,
-//     message: skillMessage,
-//   } = useSelector((state) => state.skill);
-//   const {
-//     softwareApplications,
-//     loading: appLoading,
-//     error: appError,
-//     message: appMessage,
-//   } = useSelector((state) => state.softwareApplications);
-
-//   const { projects, error: projectError } = useSelector(
-//     (state) => state.project
-//   );
-
-//   const [appId, setAppId] = useState(null);
-//   const handleDeleteSoftwareApp = (id) => {
-//     setAppId(id);
-//     dispatch(deleteSoftwareApplication(id));
-//   };
+    return () => {
+      dispatch(makeTimelineEmpty());
+      dispatch(makeapplicationsEmpty());
+    };
+  }, []);
 
   const dispatch = useDispatch();
 
+  const handleDeleteSoftwareApp = (id) => {
+    dispatch(deleteApplication({id}));
+  };
 
   return (
     <>
@@ -240,10 +226,9 @@ const Dashboard = () => {
                           </TableHead>
                         </TableRow>
                       </TableHeader>
-                      {/* <TableBody>
-                        {softwareApplications &&
-                        softwareApplications.length > 0 ? (
-                          softwareApplications.map((element) => {
+                      <TableBody>
+                        {applications && applications.length > 0 ? (
+                          applications.map((element) => {
                             return (
                               <TableRow className="bg-accent" key={element._id}>
                                 <TableCell className="font-medium">
@@ -257,7 +242,7 @@ const Dashboard = () => {
                                   />
                                 </TableCell>
                                 <TableCell className="md:table-cell  text-center">
-                                  {appLoading && appId === element._id ? (
+                                  {deleting ? (
                                     <SpecialLoadingButton
                                       content={"Deleting"}
                                       width={"w-fit"}
@@ -265,7 +250,7 @@ const Dashboard = () => {
                                   ) : (
                                     <Button
                                       onClick={() =>
-                                        handleDeleteSoftwareApp(element._id)
+                                        handleDeleteSoftwareApp(element?._id)
                                       }
                                     >
                                       Delete
@@ -278,11 +263,11 @@ const Dashboard = () => {
                         ) : (
                           <TableRow>
                             <TableCell className="text-3xl overflow-y-hidden">
-                              You have not added any skill.
+                              You have not added any Software Application.
                             </TableCell>
                           </TableRow>
                         )}
-                      </TableBody> */}
+                      </TableBody>
                     </Table>
                   </CardContent>
                 </Card>

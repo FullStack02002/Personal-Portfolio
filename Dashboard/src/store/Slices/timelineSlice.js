@@ -69,7 +69,7 @@ const timelineSlice = createSlice({
     })
     builder.addCase(deleteTimeline.fulfilled,(state,action)=>{
         state.loading=false;
-        state.timeline = state.timeline.filter((timeline) => timeline.id !== action.payload);
+        state.timeline = state.timeline.filter((timeline) => timeline._id !== action.payload);
     })
     builder.addCase(deleteTimeline.rejected,(state)=>{
         state.loading=false;
