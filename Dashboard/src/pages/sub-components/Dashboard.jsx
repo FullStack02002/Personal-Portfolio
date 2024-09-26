@@ -37,6 +37,7 @@ import {
   makeapplicationsEmpty,
   deleteApplication,
 } from "@/store/Slices/softwareApplicationSlice";
+import { getAllSkills,makeSkillsEmpty } from "@/store/Slices/skillsSlice";
 const Dashboard = () => {
   const navigateTo = useNavigate();
   const gotoMangeSkills = () => {
@@ -55,14 +56,17 @@ const Dashboard = () => {
     (state) => state.softwareApplication?.applications
   );
   const deleting = useSelector((state) => state.softwareApplication?.deleting);
+  const skills=useSelector((state)=>state.skills.skills);
 
   useEffect(() => {
     dispatch(getAllTimeline());
     dispatch(getAllApplication());
+    dispatch(getAllSkills());
 
     return () => {
       dispatch(makeTimelineEmpty());
       dispatch(makeapplicationsEmpty());
+      dispatch(makeSkillsEmpty());
     };
   }, []);
 
@@ -191,7 +195,7 @@ const Dashboard = () => {
                     <CardTitle>Skills</CardTitle>
                   </CardHeader>
                   <CardContent className="grid sm:grid-cols-2 gap-4">
-                    {/* {skills && skills.length > 0 ? (
+                    {skills && skills.length > 0 ? (
                       skills.map((element) => {
                         return (
                           <Card key={element._id}>
@@ -204,7 +208,7 @@ const Dashboard = () => {
                       })
                     ) : (
                       <p className="text-3xl">You have not added any skill.</p>
-                    )} */}
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>

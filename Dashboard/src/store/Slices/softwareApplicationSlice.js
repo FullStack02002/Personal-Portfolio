@@ -92,6 +92,6 @@ const softwareApplicationSlice = createSlice({
   },
 });
 
-export const {makeapplicationsEmpty}=softwareApplicationSlice.reducer;
+export const {makeapplicationsEmpty}=softwareApplicationSlice.actions;
 
 export default softwareApplicationSlice.reducer;
