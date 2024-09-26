@@ -37,6 +37,7 @@ import {
   makeapplicationsEmpty,
   deleteApplication,
 } from "@/store/Slices/softwareApplicationSlice";
+import { getAllProjects,makeProjectsEmpty } from "@/store/Slices/projectSlice";
 import { getAllSkills,makeSkillsEmpty } from "@/store/Slices/skillsSlice";
 const Dashboard = () => {
   const navigateTo = useNavigate();
@@ -57,16 +58,19 @@ const Dashboard = () => {
   );
   const deleting = useSelector((state) => state.softwareApplication?.deleting);
   const skills=useSelector((state)=>state.skills.skills);
+  const projects=useSelector((state)=>state.projects.projects);
 
   useEffect(() => {
     dispatch(getAllTimeline());
     dispatch(getAllApplication());
     dispatch(getAllSkills());
+    dispatch(getAllProjects());
 
     return () => {
       dispatch(makeTimelineEmpty());
       dispatch(makeapplicationsEmpty());
       dispatch(makeSkillsEmpty());
+      dispatch(makeProjectsEmpty());
     };
   }, []);
 
@@ -139,7 +143,7 @@ const Dashboard = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {/* {projects && projects.length > 0 ? (
+                        {projects && projects.length > 0 ? (
                           projects.map((element) => {
                             return (
                               <TableRow className="bg-accent" key={element._id}>
@@ -181,7 +185,7 @@ const Dashboard = () => {
                               You have not added any project.
                             </TableCell>
                           </TableRow>
-                        )} */}
+                        )}
                       </TableBody>
                     </Table>
                   </CardContent>
