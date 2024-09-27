@@ -23,7 +23,7 @@ export const deleteProject = createAsyncThunk(
   "deleteProject",
   async ({ id }) => {
     try {
-      const response = await axiosInstance.delete(`project/delete/{id}`);
+      const response = await axiosInstance.delete(`project/delete/${id}`);
       toast.success(response.data.message);
       return id;
     } catch (error) {
@@ -94,7 +94,7 @@ const projectSlice = createSlice({
     })
     builder.addCase(deleteProject.fulfilled,(state,action)=>{
         state.loading=false;
-        state.projects=projects.filter(project=>project._id!==action.payload.id);
+        state.projects=state.projects.filter(project=>project._id!==action.payload);
     })
     builder.addCase(deleteProject.rejected,(state)=>{
         state.loading=false;

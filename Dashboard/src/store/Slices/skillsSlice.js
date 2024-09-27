@@ -79,7 +79,7 @@ export const skillsSlice = createSlice({
     });
     builder.addCase(deleteSkill.fulfilled, (state) => {
       state.loading = false;
-      state.skills = skills.filter((skill) => skill._id !== action.payload.id);
+      state.skills = state.skills.filter((skill) => skill._id !== action.payload);
     });
     builder.addCase(deleteSkill.rejected, (state) => {
       state.loading = false;

@@ -9,6 +9,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import ManageProjects from "./pages/ManageProjects";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -27,10 +28,18 @@ const App = () => {
             </AuthLayout>
           }
         />
+        <Route
+          path="/manage/projects"
+          element={
+            <AuthLayout authentication={true}>
+              <ManageProjects />
+            </AuthLayout>
+          }
+        />
 
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/password/forgot" element={<ForgotPassword/>}/>
-        <Route path="/password/reset/:token" element={<ResetPassword/>}/>
+        <Route path="/password/forgot" element={<ForgotPassword />} />
+        <Route path="/password/reset/:token" element={<ResetPassword />} />
       </Routes>
       <ToastContainer
         position="bottom-right"
