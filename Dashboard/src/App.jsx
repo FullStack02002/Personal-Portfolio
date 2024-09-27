@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ManageProjects from "./pages/ManageProjects";
+import ViewProject from "./pages/ViewProject";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -33,6 +34,14 @@ const App = () => {
           element={
             <AuthLayout authentication={true}>
               <ManageProjects />
+            </AuthLayout>
+          }
+        />
+        <Route
+          path="/view/project/:id"
+          element={
+            <AuthLayout authentication={true}>
+              <ViewProject />
             </AuthLayout>
           }
         />

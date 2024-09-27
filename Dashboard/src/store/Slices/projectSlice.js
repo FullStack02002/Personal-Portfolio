@@ -113,6 +113,6 @@ const projectSlice = createSlice({
   },
 });
 
-export const { makeProjectsEmpty } = projectSlice.actions;
+export const { makeProjectsEmpty,makeProjectEmpty } = projectSlice.actions;
 
 export default projectSlice.reducer;
